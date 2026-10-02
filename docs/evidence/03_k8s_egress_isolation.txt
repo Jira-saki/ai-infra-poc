@@ -1,0 +1,9 @@
+[TEST 1: RFC1918 Private LAN Isolation]
+Target: https://192.168.150.186:6443 (Controlplane K8s API)
+Result: Connection timed out after 4001 milliseconds
+Status: DROPPED / BLOCKED (Enforced by ai-inference-netpol)
+
+[TEST 2: Public Internet Egress]
+Target: https://1.1.1.1
+Result: HTTP/2 301 (Cloudflare Edge KIX)
+Status: ALLOWED (Enforced by ai-inference-netpol)

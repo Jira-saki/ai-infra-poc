@@ -1,0 +1,23 @@
+- rule: Unauthorized Shell in AI Inference Container
+  desc: Detect shell execution inside hardened inference-engine container
+  condition: >
+    spawned_process and container
+    and container.name startswith "inference-engine"
+    and proc.name in (sh, bash, ash, dash, zsh)
+  output: >
+    CRITICAL: Unauthorized shell spawned in AI inference workload
+    (user=%user.name pod=%k8s.pod.name ns=%k8s.ns.name container=%container.name proc=%proc.name cmdline=%proc.cmdline)
+  priority: CRITICAL
+  tags: [ai_security, incident_response, pss_violation]
+
+- rule: Unexpected Binary Execution in AI Container
+  desc: Detect unauthorized binaries running outside Python runtime
+  condition: >
+    spawned_process and container
+    and container.name startswith "inference-engine"
+    and not (proc.name in (python, python3, uvicorn))
+  output: >
+    WARNING: Non-runtime process executed in AI container
+    (user=%user.name pod=%k8s.pod.name ns=%k8s.ns.name proc=%proc.name cmdline=%proc.cmdline)
+  priority: WARNING
+  tags: [ai_security, anomaly_detection]

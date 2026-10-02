@@ -1,0 +1,22 @@
+HTTP/1.1 200 OK
+CF-Cache-Status: DYNAMIC
+CF-Ray: a430a2f03c36fc98-KIX
+Connection: keep-alive
+Content-Encoding: gzip
+Content-Type: application/json
+Date: Wed, 30 Sep 2026 04:55:38 GMT
+Server: cloudflare
+Transfer-Encoding: chunked
+X-Robots-Tag: none, none
+
+{
+    "embedding_dim": 384,
+    "embedding_sample": [
+        -0.025805793702602386,
+        -0.08206288516521454,
+        -0.049300890415906906,
+        0.0050214845687150955,
+        0.09452573955059052
+    ],
+    "text": "Testing live inference over Cloudflare Edge"
+}

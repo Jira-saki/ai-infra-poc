@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-inference-deployment
+  namespace: default
+  labels:
+    app: ai-inference
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-inference
+  template:
+    metadata:
+      labels:
+        app: ai-inference
+    spec:
+      terminationGracePeriodSeconds: 45
+      nodeSelector:
+        kubernetes.io/hostname: worker-node02
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: inference-engine
+          image: docker.io/library/ai-inference:local
+          imagePullPolicy: Never
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - containerPort: 8000
+              name: http
+          env:
+            - name: MODEL_PATH
+              value: "/app/model"
+            - name: OMP_NUM_THREADS
+              value: "1"
+            - name: HF_HUB_OFFLINE
+              value: "1"
+            - name: TRANSFORMERS_OFFLINE
+              value: "1"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 3
+            failureThreshold: 20
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+      volumes:
+        - name: tmp-volume
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-inference-svc
+  namespace: default
+  labels:
+    app: ai-inference
+spec:
+  type: ClusterIP
+  selector:
+    app: ai-inference
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000

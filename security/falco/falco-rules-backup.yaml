@@ -1,0 +1,25 @@
+apiVersion: v1
+data:
+  rules-incident-response.yaml: "- rule: Unauthorized Shell in Target Container\n
+    \ desc: Detect shell spawn inside target container\n  condition: >\n    spawned_process
+    and container\n    and (container.name startswith \"juice-shop\" or container.name
+    startswith \"attack-sim\")\n    and proc.name in (sh, bash, ash, dash)\n  output:
+    >\n    CRITICAL: Terminal shell spawned in container \n    (user=%user.name pod=%k8s.pod.name
+    ns=%k8s.ns.name container=%container.name proc=%proc.name cmdline=%proc.cmdline)\n
+    \ priority: CRITICAL\n  tags: [incident_response, container_escape]"
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: falco
+    meta.helm.sh/release-namespace: falco
+  creationTimestamp: "2026-09-22T06:58:00Z"
+  labels:
+    app.kubernetes.io/instance: falco
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: falco
+    app.kubernetes.io/version: 0.45.0
+    helm.sh/chart: falco-9.2.0
+  name: falco-rules
+  namespace: falco
+  resourceVersion: "159902"
+  uid: 74fc5cd2-c8cb-4964-9c5b-fc22aaa7fe3f

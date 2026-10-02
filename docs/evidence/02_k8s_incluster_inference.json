@@ -1,0 +1,11 @@
+{
+  "text": "Hardened K8s pod verification on worker-node02",
+  "embedding_dim": 384,
+  "embedding_sample": [
+    -0.0764428898692131,
+    0.06386748701334,
+    0.08267843723297119,
+    0.023304494097828865,
+    0.03955822065472603
+  ]
+}
