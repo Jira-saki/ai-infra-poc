@@ -1,0 +1,22 @@
+=== AUTOMATED INCIDENT CONTAINMENT VERIFICATION ===
+Timestamp: 2026-10-02 02:43:10Z
+Target Pod: ai-inference-deployment-76bc5c65b7-zf9x5
+Namespace: default
+Pod Labels: {"app":"ai-inference","pod-template-hash":"76bc5c65b7","quarantine":"true"}
+
+[1] FALCO eBPF RUNTIME EVENT:
+{"hostname":"worker-node02","output":"01:48:48.166281053: Notice A shell was spawned in a container with an attached terminal | evt_type=execve user=appuser user_uid=10001 user_loginuid=-1 process=sh proc_exepath=/usr/bin/dash parent=containerd-shim command=sh -c id; whoami terminal=34816 exe_flags=EXE_LOWER_LAYER container_id=ed837f34dfb7 container_name=inference-engine container_image_repository=docker.io/library/ai-inference container_image_tag=local k8s_pod_name=ai-inference-deployment-76bc5c65b7-zf9x5 k8s_ns_name=default","output_fields":{"container.id":"ed837f34dfb7","container.image.repository":"docker.io/library/ai-inference","container.image.tag":"local","container.name":"inference-engine","evt.arg.flags":"EXE_LOWER_LAYER","evt.time":1790905728166281053,"evt.type":"execve","k8s.ns.name":"default","k8s.pod.name":"ai-inference-deployment-76bc5c65b7-zf9x5","proc.cmdline":"sh -c id; whoami","proc.exepath":"/usr/bin/dash","proc.name":"sh","proc.pname":"containerd-shim","proc.tty":34816,"user.loginuid":-1,"user.name":"appuser","user.uid":10001},"priority":"Notice","rule":"Terminal shell in container","source":"syscall","tags":["T1059","container","maturity_stable","mitre_execution","shell"],"time":"2026-10-02T01:48:48.166281053Z"}
+
+[2] REMEDIATION WEBHOOK EXECUTION:
+10.244.87.250 - - [02/Oct/2026 02:32:48] "POST / HTTP/1.1" 200 -
+10.244.87.250 - - [02/Oct/2026 02:32:48] "POST / HTTP/1.1" 200 -
+10.244.87.250 - - [02/Oct/2026 02:32:48] "POST / HTTP/1.1" 200 -
+10.244.87.250 - - [02/Oct/2026 02:33:24] "POST / HTTP/1.1" 200 -
+10.244.87.250 - - [02/Oct/2026 02:40:26] "POST / HTTP/1.1" 200 -
+10.244.87.250 - - [02/Oct/2026 02:42:48] "POST / HTTP/1.1" 200 -
+
+[3] CALICO NETWORK ISOLATION VERIFICATION:
+$ kubectl run test-quarantine-blocked --image=curlimages/curl --rm -it --restart=Never -- curl -v -m 3 http://ai-inference-svc:8000/healthz
+* Connection timed out after 3001 milliseconds
+curl: (28) Connection timed out after 3001 milliseconds
+Status: ISOLATED (Default-Deny Ingress/Egress active)

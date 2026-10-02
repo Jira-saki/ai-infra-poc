@@ -7,6 +7,10 @@ spec:
   podSelector:
     matchLabels:
       app: ai-inference
+    matchExpressions:
+       - key: quarantine
+         operator: NotIn
+         values: ["true"]
   policyTypes:
     - Ingress
     - Egress
@@ -15,7 +19,7 @@ spec:
         - protocol: TCP
           port: 8000
   egress:
-    # 1. อนุญาตให้คุยกับ CoreDNS ภายในคลัสเตอร์
+    # 1. Allow CoreDNS 
     - to:
         - namespaceSelector: {}
           podSelector:
@@ -26,7 +30,7 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
-    # 2. ปล่อย Egress ออก Public Internet แต่บล็อก Private Subnets ทั้งหมด (RFC1918)
+    # 2. Allow Egress to Public Internet ( Block Internal Private RFC1918)
     - to:
         - ipBlock:
             cidr: 0.0.0.0/0
