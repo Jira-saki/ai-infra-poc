@@ -39,24 +39,37 @@ module "eks" {
     bottlerocket_spot = {
       ami_type       = "BOTTLEROCKET_x86_64"
       capacity_type  = "SPOT"
-      instance_types = ["m5.large", "m5a.large", "c5.large"]
+      instance_types = ["t3.large"]
 
       min_size     = 1
-      max_size     = 4
-      desired_size = 2
+      max_size     = 2
+      desired_size = 1
 
       subnet_ids = var.private_subnet_ids
+
+      # Bottlerocket TOML: cap max pods per node to stay within t3.large ENI limits
+      bootstrap_extra_args = <<-TOML
+        [settings.kubernetes]
+        "max-pods" = 35
+      TOML
+
+      # IMDSv2 enforcement — hop-limit=2 required for containers inside pods
+      metadata_options = {
+        http_endpoint               = "enabled"
+        http_tokens                 = "required"
+        http_put_response_hop_limit = 2
+      }
+
+      # Allow SSM Session Manager for node debugging without a bastion host
+      iam_role_additional_policies = {
+        ssm = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      }
 
       labels = {
         "node.kubernetes.io/lifecycle" = "spot"
         "workload"                     = "ai-inference"
       }
     }
-  }
-
-  tags = {
-    Environment = "prod"
-    Terraform   = "true"
   }
 }
 
