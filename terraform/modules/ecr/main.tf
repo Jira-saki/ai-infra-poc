@@ -1,6 +1,6 @@
 resource "aws_ecr_repository" "this" {
   name                 = "ai-infra-poc/ai-inference"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE"
 
   # Prevent terraform destroy being blocked when images exist in the repo
   force_delete = true
@@ -10,7 +10,7 @@ resource "aws_ecr_repository" "this" {
   }
 
   encryption_configuration {
-    encryption_type = "AES256"
+    encryption_type = "KMS"
   }
 }
 

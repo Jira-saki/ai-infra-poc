@@ -12,15 +12,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends gcc && \
 ENV PATH="/opt/venv/bin:$PATH"
 ENV HF_HOME="/tmp/hf_build_cache"
 
-# Pre-download Model Weight และบันทึกลงโฟลเดอร์ปลายทางโดยตรง
+# Pre-download Model Weight
 RUN python3 -c "from sentence_transformers import SentenceTransformer; model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2'); model.save('/app/model')"
+
+# Remove build tools from venv before sending to runtime image 
+RUN /opt/venv/bin/pip uninstall -y setuptools wheel pip || true
 
 # Stage 2: Hardened Runtime Image
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# คัดลอก Virtual Environment และ Model Artifacts ที่ Build เสร็จแล้ว
+# Update OS patches to close OS-level CVEs (fixes libpcre2)
+RUN apt-get update && apt-get upgrade -y && \
+    rm -rf /var/lib/apt/lists/*
+
+# Remove residual packages in Base Python image
+RUN rm -rf /usr/local/lib/python3.11/site-packages/setuptools* \
+           /usr/local/lib/python3.11/site-packages/wheel* \
+           /usr/local/lib/python3.11/site-packages/pip*
+
+# Copy Virtual Environment and Model Artifacts
 COPY --from=builder /opt/venv /opt/venv
 COPY --from=builder /app/model /app/model
 
@@ -35,7 +47,7 @@ ENV OMP_NUM_THREADS=1
 
 COPY main.py .
 
-# สร้าง Non-root User (UID 10001) และตั้ง Permission
+# Build Non-root User (UID 10001)
 RUN groupadd -g 10001 appgroup && \
     useradd -u 10001 -g appgroup -d /app -s /sbin/nologin appuser && \
     chown -R appuser:appgroup /app && \
