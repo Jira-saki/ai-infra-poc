@@ -14,6 +14,14 @@ terraform {
 
 provider "aws" {
   region = var.region
+
+  default_tags {
+    tags = {
+      Environment = "ephemeral-lab"
+      Project     = "ai-infra-poc"
+      ManagedBy   = "terraform"
+    }
+  }
 }
 
 provider "helm" {

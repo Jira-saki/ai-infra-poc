@@ -1,0 +1,9 @@
+framework:
+  - terraform
+skip-check:
+  - CKV_TF_1    # Modules pinned via semantic version tags instead of commit hashes
+  - CKV_AWS_37  # Control plane logging suppressed to control CloudWatch costs in ephemeral lab
+  - CKV_AWS_338 # Log retention capped to short-term for lab budget
+  - CKV_AWS_39  # Public endpoint required for remote CLI administration
+  - CKV2_AWS_5  # Dynamic security group attachment validated post-apply
+  - CKV_AWS_158 # CloudWatch KMS CMK encryption suppressed to avoid $1.00/key fee in ephemeral lab

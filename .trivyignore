@@ -1,0 +1,5 @@
+# Compensating Control: StaticFiles is not mounted; endpoint only serves JSON inference
+CVE-2026-48818
+
+# Compensating Control: No form-urlencoded parsing used; payload validated via Pydantic model
+CVE-2026-54283

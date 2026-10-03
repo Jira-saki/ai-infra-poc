@@ -1,8 +1,8 @@
 resource "aws_ecr_repository" "this" {
-  name                 = "ai-inference"
-  image_tag_mutability = "MUTABLE"
+  name                 = "ai-infra-poc/ai-inference"
+  image_tag_mutability = "IMMUTABLE"
 
-  # ป้องกันปัญหา terraform destroy บล็อกเมื่อมี Image ค้างใน Repo
+  # Prevent terraform destroy being blocked when images exist in the repo
   force_delete = true
 
   image_scanning_configuration {
@@ -10,19 +10,42 @@ resource "aws_ecr_repository" "this" {
   }
 
   encryption_configuration {
-    encryption_type = "AES256"
-  }
-
-  tags = {
-    Environment = "prod"
-    Workload    = "ai-inference"
+    encryption_type = "KMS"
   }
 }
 
-output "repository_url" {
-  value = aws_ecr_repository.this.repository_url
-}
+# Retain only the last 3 images to cap ECR storage costs
+resource "aws_ecr_lifecycle_policy" "this" {
+  repository = aws_ecr_repository.this.name
 
-output "repository_arn" {
-  value = aws_ecr_repository.this.arn
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Keep last 3 tagged images"
+        selection = {
+          tagStatus     = "tagged"
+          tagPrefixList = ["v"]
+          countType     = "imageCountMoreThan"
+          countNumber   = 3
+        }
+        action = {
+          type = "expire"
+        }
+      },
+      {
+        rulePriority = 2
+        description  = "Expire all untagged images immediately"
+        selection = {
+          tagStatus   = "untagged"
+          countType   = "sinceImagePushed"
+          countUnit   = "days"
+          countNumber = 1
+        }
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
 }
