@@ -1,6 +1,6 @@
 # ai-infra-poc
 
-[English](README.md) | [日本語](README.ja.md)
+[🇺🇸 English](README.md) | [🇯🇵 日本語](README.ja.md)
 
 シフトレフトセキュリティゲートと厳格なコストガードレールを備えた、**AWS EKS** 上の堅牢（Hardened）かつエフェメラルな AI 推論マイクロサービス。ライフサイクル全体を検証済み：67個のリソースを計画（Plan）→ プロビジョニング（Apply）→ 破棄（Destroy）、リソースの残存（Dangling resources）はゼロ。
 

@@ -1,6 +1,6 @@
 # ai-infra-poc
 
-[English](README.md) | [日本語](README.ja.md)
+[🇺🇸 English](README.md) | [🇯🇵 日本語](README.ja.md)
 
 Hardened, ephemeral AI inference microservice on **AWS EKS** with shift-left security gates and strict cost guardrails. Full lifecycle verified: 67 resources planned → provisioned → destroyed, zero dangling resources.
 
