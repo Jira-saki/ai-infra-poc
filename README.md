@@ -4,15 +4,7 @@ Hardened, ephemeral AI inference microservice on **AWS EKS** with shift-left sec
 
 ## Architecture (AWS EKS)
 
-```mermaid
-flowchart LR
-  A["Dev push"] --> B{{"Trivy gate<br/>CRITICAL/HIGH block"}}
-  B -->|pass| C[("ECR<br/>immutable, scan-on-push")]
-  B -->|fail| X["Rejected"]
-  C --> D["EKS 1.30<br/>Spot t3.large<br/>Bottlerocket 1.63.0"]
-  D --> E["FastAPI + PyTorch<br/>non-root UID 10001"]
-  F{{"Checkov<br/>36/36"}} -. "IaC gate" .-> D
-```
+![Architecture (AWS EKS)](docs/architecture/architecture-aws-eks.png)
 
 | Layer | Detail |
 |---|---|
